@@ -12,5 +12,6 @@
 #' Maintainer: Daniel Fischer <daniel.fischer@luke.fi>
 #'
 #' @importFrom htmltab htmltab
+#' @importFrom RCurl url.exists
 #'
 NULL

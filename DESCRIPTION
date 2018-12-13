@@ -6,7 +6,7 @@ Date: 2018-12-13
 Author: Daniel Fischer
 Maintainer: Daniel Fischer <daniel.fischer@luke.fi>
 Description: A loose collection of tools to interact with the UniProt database.
-Depends: R (>= 3.3), htmltab (>= 0.7.1)
+Depends: R (>= 3.3), htmltab (>= 0.7.1), RCurl (>= 1.95)
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 License: GPL (>= 2)
