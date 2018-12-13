@@ -1,0 +1,11 @@
+LOG of the CHANGES in the package GenomicTools.uniprot
+
+-----------------------------------------------------
+
+Version with odd last numbers are development versions.
+Stable releases have even version numbers:
+
+-----------------------------------------------------
+
+Version 0.1 (Developer Version):
+* Initial commit with most import functions added

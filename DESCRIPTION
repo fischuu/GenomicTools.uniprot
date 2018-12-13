@@ -1,0 +1,14 @@
+Package: GenomicTools.uniprot
+Type: Package
+Title: Collection of Tools to Interact with UniProt
+Version: 0.1
+Date: 2018-12-13
+Author: Daniel Fischer
+Maintainer: Daniel Fischer <daniel.fischer@luke.fi>
+Description: A loose collection of tools to interact with the UniProt database.
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyLoad: yes
+RoxygenNote: 6.1.0
