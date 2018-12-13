@@ -11,5 +11,6 @@
 #' 
 #' Maintainer: Daniel Fischer <daniel.fischer@luke.fi>
 #'
+#' @importFrom htmltab htmltab
 #'
 NULL

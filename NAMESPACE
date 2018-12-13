@@ -2,3 +2,4 @@
 
 S3method(print,fa)
 export(uniprotID2Sequence)
+importFrom(htmltab,htmltab)
