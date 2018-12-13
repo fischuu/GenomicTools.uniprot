@@ -19,7 +19,15 @@ uniprotID2Sequence <- function(x, dryrun=FALSE, verbose=TRUE){
     fastaSeq <- vector(mode="character", length=numberOfSequences)
     for(seqRun in 1:numberOfSequences){
       if(verbose) cat("Process",x[seqRun],"...\n")
-      htmlIn <- readLines(paste('https://www.uniprot.org/uniprot/', x[seqRun], sep="") )
+      
+      tryError <- try(htmltab(paste("https://www.uniprot.org/uniprot/?query=", x[seqRun], sep=""), which=1, rm_nodata_cols=FALSE))
+      if(sum(is.element("Entry",colnames(tryError)))==0){
+        readInThis <-x[seqRun]
+      } else {
+        ifelse("try-error" %in% class(tryError), readInThis <-x[seqRun], readInThis <- tryError[1,2])
+      }
+            
+      htmlIn <- readLines(paste('https://www.uniprot.org/uniprot/', readInThis, sep=""), warn=FALSE)
       
     # Grep the sequence start and end postion in the vector
       seqStart <-grep("When browsing through different UniProt", htmlIn) + 1
