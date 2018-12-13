@@ -23,57 +23,74 @@ uniprotID2Sequence <- function(x, dryrun=FALSE, verbose=TRUE){
     for(seqRun in 1:numberOfSequences){
       if(verbose) cat("Process ID ",x[seqRun]," (",seqRun,")...", sep="")
 
-    # Do I first query, if the ID is in Uniprot or not, or if we need to go to a subpage      
-      tryError <- try(htmltab(paste("https://www.uniprot.org/uniprot/?query=", x[seqRun], sep=""), which=1, rm_nodata_cols=FALSE))
-      if(sum(is.element("Entry",colnames(tryError)))==0){
-        readInThis <-x[seqRun]
-      } else {
-        ifelse("try-error" %in% class(tryError), readInThis <-x[seqRun], readInThis <- tryError[1,2])
-      }
+      uniprotURL <- paste('https://www.uniprot.org/uniprot/', x[seqRun], sep="")
       
-      uniprotURL <- paste('https://www.uniprot.org/uniprot/', readInThis, sep="")
-
-    # If the uniprotID exists, fetch the data, otherwise try to find it via Uniparc
       if(url.exists(uniprotURL)){
-         if(verbose) cat("found! \n")
-         htmlIn <- readLines(uniprotURL, warn=FALSE)
-       # Grep the sequence start and end postion in the vector
-         seqStart <- grep("When browsing through different UniProt", htmlIn) + 1
-         seqEnd <- grep("Align this entry with its isoforms.", htmlIn) - 1
-         
+        if(verbose) cat("found! \n")
+        htmlIn <- readLines(uniprotURL, warn=FALSE)
+        # Grep the sequence start and end postion in the vector
+        seqStart <- grep("When browsing through different UniProt", htmlIn) + 1
+        seqEnd <- grep("Align this entry with its isoforms.", htmlIn) - 1
+
+        seqStart <- max(seqStart)
+        seqEnd <- min(seqEnd)
+        
       } else {
-        x[seqRun] <- sapply(strsplit(x[seqRun],"\\."),"[",1)
-        if(verbose) cat("not found, try to use UniParc ...")
-        tryError <- try(htmltab(paste("https://www.uniprot.org/uniparc/?query=", x[seqRun], sep=""), which=1, rm_nodata_cols=FALSE))
+      # Do I first query, if the ID is in Uniprot or not, or if we need to go to a subpage      
+        tryError <- try(htmltab(paste("https://www.uniprot.org/uniprot/?query=", x[seqRun], sep=""), which=1, rm_nodata_cols=FALSE), silent=TRUE)
+      
+        ifelse("try-error" %in% class(tryError), readInThis <-x[seqRun], readInThis <- tryError[1,2])
+        
+        uniprotURL <- paste('https://www.uniprot.org/uniprot/', readInThis, sep="")
+
+      # If the uniprotID exists, fetch the data, otherwise try to find it via Uniparc
+        if(url.exists(uniprotURL)){
+           if(verbose) cat("found! \n")
+           htmlIn <- readLines(uniprotURL, warn=FALSE)
+         # Grep the sequence start and end postion in the vector
+           seqStart <- grep("When browsing through different UniProt", htmlIn) + 1
+           seqEnd <- grep("Align this entry with its isoforms.", htmlIn) - 1
+         
+        } else {
+          x[seqRun] <- sapply(strsplit(x[seqRun],"\\."),"[",1)
+          if(verbose) cat("not found, try to use UniParc ...")
+          tryError <- try(htmltab(paste("https://www.uniprot.org/uniparc/?query=", x[seqRun], sep=""), which=1, rm_nodata_cols=FALSE), silent=TRUE)
     
-        if(sum(is.element("Entry",colnames(tryError)))==0){
-          readInThis <-x[seqRun]
-        } else {
-          ifelse("try-error" %in% class(tryError), readInThis <-x[seqRun], readInThis <- tryError[1,2])
-        }
+          if(sum(is.element("Entry",colnames(tryError)))==0){
+            readInThis <-x[seqRun]
+          } else {
+            ifelse("try-error" %in% class(tryError), readInThis <-x[seqRun], readInThis <- tryError[1,2])
+          }
         
-      # If Protein was found via UniParc, get the sequence from there
-        uniparcURL <- paste('https://www.uniprot.org/uniparc/', readInThis, sep="")
+        # If Protein was found via UniParc, get the sequence from there
+          uniparcURL <- paste('https://www.uniprot.org/uniparc/', readInThis, sep="")
         
-        if(url.exists(uniparcURL)){
-          if(verbose) cat("found! \n")
-          htmlIn <- readLines(uniparcURL, warn=FALSE)
-          seqStart1 <- grep("A search result page is subdivided", htmlIn) + 1
-          seqStart2 <- grep("When browsing through different UniProt", htmlIn) + 1
+          if(url.exists(uniparcURL)){
+            if(verbose) cat("found! \n")
+            htmlIn <- readLines(uniparcURL, warn=FALSE)
+            seqStart1 <- grep("A search result page is subdivided", htmlIn) + 1
+            seqStart2 <- grep("When browsing through different UniProt", htmlIn) + 1
           
-          seqEnd1 <- grep("Align this entry with its isoforms.", htmlIn) - 1
-          seqEnd2 <- grep("This entry is in your", htmlIn) - 1
+            seqEnd1 <- grep("Align this entry with its isoforms.", htmlIn) - 1
+            seqEnd2 <- grep("This entry is in your", htmlIn) - 1
           
-          seqStart <- max(seqStart1, seqStart2)
-          seqEnd <- max(seqEnd1, seqEnd2)
+            seqStart <- max(c(seqStart1, seqStart2))
+            seqEnd <- min(c(seqEnd1, seqEnd2))
           
-        } else {
-          fastaSeq[seqRun] <- ""
+          } else {
+            if(verbose) cat("not found... Return emtpy sequence! \n")
+            fastaSeq[seqRun] <- ""
+          }
         }
       }
-
     # Extract the Sequence
-      fastaSeq[seqRun] <- as.character(paste(htmlIn[seqStart:seqEnd],collapse=""))
+      if(seqStart>0 & seqEnd < length(htmlIn)){
+        fastaSeq[seqRun] <- as.character(paste(htmlIn[seqStart:seqEnd],collapse=""))        
+      } else {
+        if(verbose) cat("sequence detection problem... Return emtpy sequence! \n")
+        fastaSeq[seqRun] <- ""
+      }
+
     }
   }  
 # Return the result
