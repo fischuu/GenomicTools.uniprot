@@ -12,4 +12,4 @@ VignetteBuilder: knitr
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyLoad: yes
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
