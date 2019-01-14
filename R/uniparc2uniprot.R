@@ -24,17 +24,30 @@ uniparc2uniprot <- function(x, dryrun=FALSE, verbose=TRUE){
     for(idRun in 1:numberOfIDs){
       # if(verbose) cat("Process ID ",x[idRun]," (",idRun,")...", sep="")
       
-      uniparcURL <- paste('https://www.uniprot.org/uniparc/', x[idRun], '.tab', sep="")
+      #uniparcURL <- paste('https://www.uniprot.org/uniparc/', x[idRun], '.tab', sep="")
+       uniparcURL <- paste('https://www.uniprot.org/uniparc/?query=',x[idRun],'&format=tab&limit=10&columns=id,organisms,kb,first-seen,last-seen,length&sort=score', sep="")
       
       if(url.exists(uniparcURL)){
-        if(verbose) cat("found! \n")
-        uniparcIn <- read.table(uniparcURL, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-      } 
-      
-      # Extract the Sequence
-      tmp <- uniparcIn[grep("UniProt",uniparcIn$Database),]
-      uniprotID[idRun,] <- c(x[idRun],tmp$Identifier[1])
+        if(verbose) cat(idRun,": ",x[idRun], " found! \n")
+        fetchURL <- function(urlIn){
+          out <- try(read.table(urlIn, sep="\t", header=TRUE, stringsAsFactors=FALSE))
+          if(inherits(out, "try-error"))
+            return(NULL)
+          else
+            return(out)
+        }
+        uniparcIn <- fetchURL(uniparcURL)
+        
+        # Extract the Sequence
+        tmp <- uniparcIn$UniProtKB
+        uniprotID[idRun,] <- c(x[idRun],tmp[1])
+      } else {
+        if(verbose) cat(x[idRun], " NOT found! \n")
+        
+        uniprotID[idRun,] <- c(x[idRun], "NA")
+      }
     }
+    if(verbose) cat("Done!!!")
   }  
   # Return the result
   uniprotID
