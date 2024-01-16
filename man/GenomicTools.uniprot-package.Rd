@@ -7,7 +7,7 @@
 GenomicTools.uniprot is a loose collection of tools to interact with the UniProt database}
 \description{
 \tabular{ll}{ Package: \tab GenomicTools.uniprot\cr Type: \tab Package\cr Version: \tab
-0.1\cr Date: \tab 2018-12-13\cr License: \tab GPL\cr LazyLoad: \tab yes\cr
+0.2\cr Date: \tab 2024-01-16\cr License: \tab GPL\cr LazyLoad: \tab yes\cr
 }
 }
 \author{
