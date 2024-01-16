@@ -1,8 +1,8 @@
 Package: GenomicTools.uniprot
 Type: Package
 Title: Collection of Tools to Interact with UniProt
-Version: 0.1
-Date: 2018-12-13
+Version: 0.2
+Date: 2024-01-16
 Author: Daniel Fischer
 Maintainer: Daniel Fischer <daniel.fischer@luke.fi>
 Description: A loose collection of tools to interact with the UniProt database.
